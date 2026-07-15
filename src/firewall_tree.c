@@ -318,8 +318,6 @@ bool firewall_tree_check_file(const FirewallTree *tree, const char *path) {
         if (firewall_tree_contains(tree, ip)) {
             ++blocked;
             printf("%s -> BLOCKED\n", ip);
-        } else {
-            printf("%s -> ALLOWED\n", ip);
         }
     }
 

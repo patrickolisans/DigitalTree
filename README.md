@@ -28,7 +28,7 @@ make
 ### Verificar uma lista de IPs
 
 ```bash
-./build/firewall --blocked tests/blocked_ips.txt --input tests/input_ips.txt
+make
 ```
 
 ### Inserir um IP na lista bloqueada

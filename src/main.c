@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 static void print_usage(const char *program) {
     printf("Uso:\n");
@@ -66,30 +67,49 @@ int main(int argc, char **argv) {
 
     switch (action) {
         case ACTION_ADD:
-            if (ip_value == NULL || !firewall_db_add(&db, ip_value)) {
-                fprintf(stderr, "Falha ao inserir o IP %s.\n", ip_value != NULL ? ip_value : "<nulo>");
-                firewall_db_free(&db);
-                return EXIT_FAILURE;
+            {
+                clock_t start = clock();
+                if (ip_value == NULL || !firewall_db_add(&db, ip_value)) {
+                    fprintf(stderr, "Falha ao inserir o IP %s.\n", ip_value != NULL ? ip_value : "<nulo>");
+                    firewall_db_free(&db);
+                    return EXIT_FAILURE;
+                }
+                clock_t end = clock();
+                double elapsed = (double)(end - start) / CLOCKS_PER_SEC;
+                printf("IP %s inserido com sucesso.\n", ip_value);
+                printf("Tempo de execucao: %.6f segundos\n", elapsed);
             }
-            printf("IP %s inserido com sucesso.\n", ip_value);
             break;
 
         case ACTION_REMOVE:
-            if (ip_value == NULL || !firewall_db_remove(&db, ip_value)) {
-                fprintf(stderr, "Falha ao remover o IP %s.\n", ip_value != NULL ? ip_value : "<nulo>");
-                firewall_db_free(&db);
-                return EXIT_FAILURE;
+            {
+                clock_t start = clock();
+                if (ip_value == NULL || !firewall_db_remove(&db, ip_value)) {
+                    fprintf(stderr, "Falha ao remover o IP %s.\n", ip_value != NULL ? ip_value : "<nulo>");
+                    firewall_db_free(&db);
+                    return EXIT_FAILURE;
+                }
+                clock_t end = clock();
+                double elapsed = (double)(end - start) / CLOCKS_PER_SEC;
+                printf("IP %s removido com sucesso.\n", ip_value);
+                printf("Tempo de execução: %.6f segundos\n", elapsed);
             }
-            printf("IP %s removido com sucesso.\n", ip_value);
             break;
 
         case ACTION_QUERY:
-            if (ip_value == NULL) {
-                fprintf(stderr, "Informe um IP para consultar.\n");
-                firewall_db_free(&db);
-                return EXIT_FAILURE;
+            {
+                clock_t start = clock();
+                if (ip_value == NULL) {
+                    fprintf(stderr, "Informe um IP para consultar.\n");
+                    firewall_db_free(&db);
+                    return EXIT_FAILURE;
+                }
+                bool result = firewall_db_contains(&db, ip_value);
+                clock_t end = clock();
+                double elapsed = (double)(end - start) / CLOCKS_PER_SEC;
+                printf("%s -> %s\n", ip_value, result ? "BLOCKED" : "ALLOWED");
+                printf("Tempo de execução: %.6f segundos\n", elapsed);
             }
-            printf("%s -> %s\n", ip_value, firewall_db_contains(&db, ip_value) ? "BLOCKED" : "ALLOWED");
             break;
 
         case ACTION_CHECK_FILE:
@@ -98,10 +118,16 @@ int main(int argc, char **argv) {
                 firewall_db_free(&db);
                 return EXIT_FAILURE;
             }
-            if (!firewall_db_check_file(&db, input_path)) {
-                fprintf(stderr, "Não foi possível abrir o arquivo %s.\n", input_path);
-                firewall_db_free(&db);
-                return EXIT_FAILURE;
+            {
+                clock_t start = clock();
+                if (!firewall_db_check_file(&db, input_path)) {
+                    fprintf(stderr, "Não foi possível abrir o arquivo %s.\n", input_path);
+                    firewall_db_free(&db);
+                    return EXIT_FAILURE;
+                }
+                clock_t end = clock();
+                double elapsed = (double)(end - start) / CLOCKS_PER_SEC;
+                printf("\nTempo de execução: %.6f segundos\n", elapsed);
             }
             break;
 
